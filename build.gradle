@@ -4,51 +4,91 @@ buildscript {
         projectVersion = "1.0.0"
 
         jphpVersion = "0.9.3-SNAPSHOT"
-        javaVersion = "1.8"
+        javaVersion = JavaVersion.VERSION_25
         junitVersion = "4.12"
     }
 }
 
+def sourceRepository = file(System.getProperty(
+        'maven.repo.local',
+        new File(rootDir, '../../.gradle/source-repo').absolutePath
+))
+
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
-    group projectGroup
-    version projectVersion
+    group = projectGroup
+    version = Boolean.getBoolean('release') ? projectVersion : "${projectVersion}-SNAPSHOT"
 
-    ext.isSnapshot = !Boolean.getBoolean("release");
-
-    if (ext.isSnapshot) {
-        version += '-SNAPSHOT'
+    java {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+        withSourcesJar()
     }
 
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
 
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+    tasks.withType(Javadoc).configureEach {
+        options.encoding = 'UTF-8'
+    }
 
     repositories {
-        mavenLocal()
+        maven {
+            name = 'devlineSource'
+            url = sourceRepository.toURI()
+        }
         mavenCentral()
     }
 
-    configurations {
-        provided
-    }
-
     sourceSets {
-        main {
-            compileClasspath += configurations.provided
-            resources.srcDirs = ['src-php', 'resources']
-        }
+        main.resources.srcDirs = ['src-php', 'resources']
     }
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+        testImplementation "junit:junit:${junitVersion}"
     }
+}
 
-    task sourcesJar(type: Jar, dependsOn: 'classes') {
-        classifier = 'sources'
-        from sourceSets.main.allSource
+subprojects {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+        repositories {
+            maven {
+                name = 'devlineSource'
+                url = sourceRepository.toURI()
+            }
+        }
     }
+}
+
+def sourceModules = [
+        ':wizard-core',
+        ':wizard-web',
+        ':wizard-web-ui',
+        ':wizard-app',
+        ':wizard-app-web',
+        ':modules:wizard-localization',
+        ':modules:wizard-httpclient',
+        ':modules:wizard-ide-support'
+]
+
+tasks.register('publishSource') {
+    group = 'publishing'
+    description = 'Publishes the Wizard artifacts used by DevLine to the workspace source repository.'
+    dependsOn sourceModules.collect { "${it}:publishMavenJavaPublicationToDevlineSourceRepository" }
+}
+
+tasks.wrapper {
+    gradleVersion = '9.7.1'
+    distributionType = Wrapper.DistributionType.ALL
 }

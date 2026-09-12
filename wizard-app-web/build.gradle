@@ -1,4 +1,4 @@
 dependencies {
-    compile project(":wizard-app")
-    compile project(":wizard-web")
+    api project(":wizard-app")
+    api project(":wizard-web")
 }

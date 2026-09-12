@@ -1,7 +1,7 @@
 
 dependencies {
-    compile project(':wizard-browser')
-    compile fileTree(include: ['*.jar'], dir: "$projectDir.path/lib")
+    implementation project(':wizard-browser')
+    implementation fileTree(include: ['*.jar'], dir: "$projectDir.path/lib")
 }
 
 task unpackNativeWin32(type: Copy) {

@@ -1,4 +1,4 @@
 
 dependencies {
-    provided project(":wizard-core")
+    compileOnly project(":wizard-core")
 }

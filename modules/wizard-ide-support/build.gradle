@@ -1,8 +1,8 @@
 
 
 dependencies {
-    provided project(":wizard-core")
-    compile project(":modules/wizard-localization")
-    compile "org.develnext.jphp:jphp-zip-ext:0.9.0-SNAPSHOT"
-    compile "org.develnext.jphp:jphp-graphic-ext:$jphpVersion"
+    compileOnly project(":wizard-core")
+    api project(":modules:wizard-localization")
+    api "org.develnext.jphp:jphp-zip-ext:$jphpVersion"
+    api "org.develnext.jphp:jphp-graphic-ext:$jphpVersion"
 }

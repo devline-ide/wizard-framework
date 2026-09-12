@@ -1,9 +1,11 @@
 apply plugin: 'application'
 
-mainClassName = 'org.develnext.framework.wizard.desktop.WizardBrowserSandbox'
+application {
+    mainClass = 'org.develnext.framework.wizard.desktop.WizardBrowserSandbox'
+}
 
 dependencies {
-    compile "org.develnext.jphp:jphp-runtime:${jphpVersion}"
-    compile fileTree(include: ['*.jar'], dir: 'lib')
+    implementation "org.develnext.jphp:jphp-runtime:${jphpVersion}"
+    implementation fileTree(include: ['*.jar'], dir: 'lib')
 }
 

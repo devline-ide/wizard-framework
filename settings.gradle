@@ -2,7 +2,6 @@
 rootProject.name = 'framework'
 
 include 'wizard-core'
-include 'wizard-ide-support'
 include 'wizard-core-legacy'
 include 'wizard-browser'
 include 'wizard-browser-fx'
@@ -11,9 +10,12 @@ include 'wizard-browser-win64'
 include 'wizard-browser-linux64'
 include 'wizard-web'
 include 'wizard-web-ui'
-include 'wizard-web-ui/components/ace-editor'
-include 'wizard-web-ui/components/slider'
-include 'wizard-web-ui/components/craft-game-engine'
+include ':wizard-web-ui:components:ace-editor'
+project(':wizard-web-ui:components:ace-editor').projectDir = file('wizard-web-ui/components/ace-editor')
+include ':wizard-web-ui:components:slider'
+project(':wizard-web-ui:components:slider').projectDir = file('wizard-web-ui/components/slider')
+include ':wizard-web-ui:components:craft-game-engine'
+project(':wizard-web-ui:components:craft-game-engine').projectDir = file('wizard-web-ui/components/craft-game-engine')
 
 include 'wizard-app'
 include 'wizard-app-web'
@@ -25,9 +27,11 @@ include 'sandbox-browser'
 
 // modules.
 
-file("$rootDir.path/modules").listFiles().each { file ->
-    if (file.directory && file.name.startsWith("wizard-")) {
-        include "modules/$file.name"
+file("$rootDir.path/modules").listFiles().each { moduleDir ->
+    if (moduleDir.directory && moduleDir.name.startsWith('wizard-')) {
+        def projectPath = ":modules:${moduleDir.name}"
+        include projectPath
+        project(projectPath).projectDir = moduleDir
     }
 }
 

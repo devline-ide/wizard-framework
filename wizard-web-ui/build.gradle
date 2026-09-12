@@ -6,7 +6,7 @@ plugins {
 node {
     version = '6.11.3'
     npmVersion = '3.10.10'
-    download = true
+    download = false
 
     nodeModulesDir = file("${project.projectDir}/src-js")
 }
@@ -17,7 +17,7 @@ gulp {
 }
 
 dependencies {
-    compile project(":wizard-core")
+    api project(":wizard-core")
 }
 
 task buildCss(dependsOn: 'gulp_compile-css') {
@@ -49,4 +49,6 @@ task buildWebLib(dependsOn: ['buildCss', 'buildJs']) {
 
 
 
-processResources.dependsOn buildWebLib
+if (providers.gradleProperty('rebuildWebAssets').map(String::toBoolean).getOrElse(false)) {
+    processResources.dependsOn buildWebLib
+}
