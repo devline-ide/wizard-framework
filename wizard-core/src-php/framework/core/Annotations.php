@@ -53,11 +53,11 @@ class Annotations
 
     /**
      * @param string $annotationName
-     * @param string $comment
+     * @param string|null $comment
      * @param mixed $default
      * @return mixed
      */
-    public static function get(string $annotationName, string $comment, $default = null)
+    public static function get(string $annotationName, ?string $comment, $default = null)
     {
         if (!$comment) {
             return $default;
@@ -85,12 +85,15 @@ class Annotations
     }
 
     /**
-     * @param string $comment
+     * @param string|null $comment
      * @param callable|null $callback
      * @return array
      */
-    public static function parse(string $comment, callable $callback = null): array
+    public static function parse(?string $comment, callable $callback = null): array
     {
+        if (!$comment) {
+            return [];
+        }
         $regex = new Regex('\\@([a-z0-9\\-\\_]+)([ ]+(.+))?', 'im', $comment);
 
         $result = [];
